@@ -1,50 +1,138 @@
 <!DOCTYPE html>
 <html>
    <head>
-      <title>Rubber bands with layered elements</title>
+      <title>Image Editor</title>
       <style>
          body {
            background: FFFFFF;
+           font-family: Arial, sans-serif;
          }
          #canvas {
-           /*margin-left: 20px;*/
            margin-right: 0;
-           /*margin-bottom: 20px;*/
            border: thin solid #aaaaaa;
            cursor: crosshair;
            padding: 0;
-           /*position: absolute;*/
          }
          #controls {
            margin: 20px 0px 20px 20px;
+           display: flex;
+           flex-wrap: wrap;
+           gap: 10px;
+         }
+         #controls button, #controls input[type='button'] {
+           padding: 8px 16px;
+           cursor: pointer;
+           background: #f0f0f0;
+           border: 1px solid #ccc;
+           border-radius: 4px;
+         }
+         #controls button:hover, #controls input[type='button']:hover {
+           background: #e0e0e0;
          }
          #rubberbandDiv {
            position: absolute;
            border: 3px dotted #FFF;
            cursor: crosshair;
            display: none;
-
-           /*z-index: 9999;*/
          }
-         /*#canvas-container {
-           position: relative;
-         }*/
+         .control-section {
+           margin-bottom: 15px;
+           padding: 10px;
+           border: 1px solid #ddd;
+           border-radius: 5px;
+           background: #f9f9f9;
+         }
+         .section-title {
+           font-weight: bold;
+           margin-bottom: 10px;
+           color: #333;
+         }
+         .text-controls {
+           display: flex;
+           flex-wrap: wrap;
+           gap: 10px;
+           align-items: center;
+         }
+         .text-controls label {
+           margin-right: 5px;
+         }
+         .text-controls select, .text-controls input[type='number'], .text-controls input[type='text'] {
+           padding: 6px;
+           border: 1px solid #ccc;
+           border-radius: 4px;
+         }
+         .text-controls input[type='color'] {
+           padding: 2px;
+           height: 30px;
+           width: 50px;
+         }
       </style>
    </head>
    <body id="body_1">
-      <div id='controls'>
-         <input type='button' id='resetButton' value='Reset'/>
-         <button type="button" id="ib" data-step="10" data-currentvalue="0" data-max="50">Increase Brightness</button>
-         <button type="button" id="db" data-step="-10" data-currentvalue="0" data-min="-50">Reduce Brightness</button>
-         <button type="button" id="rl" data-step="-30" data-currentvalue="0">Rotate Left</button>
-         <button type="button" id="rr" data-step="30" data-currentvalue="0">Rotate Right</button>
-         <button type="button" id="ic" data-step="10" data-currentvalue="0" data-max="50">Increase Contrast</button>
-         <button type="button" id="dc" data-step="-10" data-currentvalue="0" data-min="-50">Reduce Contrast</button>
-         <!--<button type="button" id="crop">Crop</button>-->
-         <button type="button" id="zi" data-currentvalue="0" data-step="1.6" data-max="3.7">Zoom In</button>
-         <button type="button" id="zo" data-currentvalue="0" data-step="0.625" data-min="-2.4">Zoom Out</button>
-         <!--<button type="button" id="undo">Undo Previous</button>-->
+      <div class="control-section">
+         <div class="section-title">History Control</div>
+         <div id='history-controls'>
+            <button type="button" id="undoButton" disabled>Undo</button>
+            <button type="button" id="redoButton" disabled>Redo</button>
+            <input type='button' id='resetButton' value='Reset'/>
+         </div>
       </div>
+
+      <div class="control-section">
+         <div class="section-title">Basic Adjustments</div>
+         <div id='basic-controls'>
+            <button type="button" id="ib" data-step="10" data-currentvalue="0" data-max="50">Increase Brightness</button>
+            <button type="button" id="db" data-step="-10" data-currentvalue="0" data-min="-50">Reduce Brightness</button>
+            <button type="button" id="ic" data-step="10" data-currentvalue="0" data-max="50">Increase Contrast</button>
+            <button type="button" id="dc" data-step="-10" data-currentvalue="0" data-min="-50">Reduce Contrast</button>
+            <button type="button" id="rl" data-step="-30" data-currentvalue="0">Rotate Left</button>
+            <button type="button" id="rr" data-step="30" data-currentvalue="0">Rotate Right</button>
+            <button type="button" id="zi" data-currentvalue="0" data-step="1.6" data-max="3.7">Zoom In</button>
+            <button type="button" id="zo" data-currentvalue="0" data-step="0.625" data-min="-2.4">Zoom Out</button>
+         </div>
+      </div>
+
+      <div class="control-section">
+         <div class="section-title">Filters</div>
+         <div id='filter-controls'>
+            <button type="button" id="grayscaleFilter">Black & White</button>
+            <button type="button" id="sepiaFilter">Sepia (Vintage)</button>
+            <button type="button" id="blurFilter">Blur</button>
+            <button type="button" id="sharpenFilter">Sharpen</button>
+            <button type="button" id="enhanceContrastFilter">Enhance Contrast</button>
+            <button type="button" id="removeFilter">Remove All Filters</button>
+         </div>
+      </div>
+
+      <div class="control-section">
+         <div class="section-title">Text Annotation</div>
+         <div class="text-controls">
+            <label for="textInput">Text:</label>
+            <input type="text" id="textInput" placeholder="Enter text here" value="Sample Text">
+            
+            <label for="fontSelect">Font:</label>
+            <select id="fontSelect">
+               <option value="Arial">Arial</option>
+               <option value="Times New Roman">Times New Roman</option>
+               <option value="Georgia">Georgia</option>
+               <option value="Verdana">Verdana</option>
+               <option value="Courier New">Courier New</option>
+               <option value="Impact">Impact</option>
+            </select>
+            
+            <label for="fontSize">Size:</label>
+            <input type="number" id="fontSize" min="8" max="100" value="24">
+            
+            <label for="fontColor">Color:</label>
+            <input type="color" id="fontColor" value="#000000">
+            
+            <button type="button" id="addTextButton">Add Text</button>
+         </div>
+         <div style="margin-top: 10px; color: #666; font-size: 12px;">
+            Click on the canvas to position the text, then click "Add Text" to confirm.
+         </div>
+      </div>
+
       <div id="canvas-container">
         <div id='rubberbandDiv'></div>
         <canvas id='canvas' width='800' height='520'>
